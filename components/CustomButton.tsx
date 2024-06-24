@@ -32,15 +32,16 @@ const CustomButton = ({
           variant === 'primary' ? 'text-white' : 'text-slate-800'
         } text-lg font-semibold ${titleStyles}`}
       >
-        {title}
+        {isLoading ? (
+          <ActivityIndicator
+            size={'small'}
+            animating={isLoading}
+            color={'#1e293b'}
+          />
+        ) : (
+          <>{title}</>
+        )}
       </Text>
-      {isLoading && (
-        <ActivityIndicator
-          size={'small'}
-          animating={isLoading}
-          color={variant === 'primary' ? 'white' : 'slate'}
-        />
-      )}
     </TouchableOpacity>
   );
 };

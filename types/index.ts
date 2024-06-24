@@ -1,12 +1,13 @@
-export interface Product {
+export interface Post {
   id: string;
-  name: string;
-  description: string;
-  price: number;
+  title: string;
+  body: string;
 }
 
-export interface User {
+export interface Comment {
   id: string;
+  postId: string;
   name: string;
   email: string;
+  body: string;
 }

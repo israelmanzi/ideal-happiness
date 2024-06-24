@@ -1,63 +1,79 @@
-import CustomButton from '@/components/CustomButton';
-import useAuth from '@/hooks/useAuth';
+import usePosts from '@/hooks/usePosts';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Image, ScrollView, Text, View } from 'react-native';
+import {
+  FlatList,
+  Text,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const Onboarding = () => {
-  const { user, logout } = useAuth();
+export default function HomeScreen() {
+  const { posts, isLoading, error, setSize, isReachingEnd } = usePosts();
   const router = useRouter();
+
+  const loadMore = () => {
+    if (!isReachingEnd) {
+      setSize((size) => size + 1);
+    }
+  };
   return (
-    <SafeAreaView className="bg-white">
-      <ScrollView
-        contentContainerStyle={{
-          height: '100%',
-        }}
-      >
-        <View className="h-full items-center justify-center px-6 font-rubik">
-          <Text className="text-2xl font-semibold font-rubik">
-            Product Management System
+    <SafeAreaView className="bg-white h-full px-3 pt-3">
+      <View className="flex-row justify-between items-center">
+        <Text onPress={() => router.push('/')} className="text-2xl font-bold">
+          Posts
+        </Text>
+        <TouchableOpacity
+          onPress={() => router.push('/create-post')}
+          className="p-2"
+        >
+          <Text className="text-base bg-slate-800 border border-slate-800 p-2 rounded-md text-white">
+            Create Post
           </Text>
-          {user ? (
-            <View className="w-full mt-6">
-              <Text className="text-center text-lg text-slate-800 py-4 ">
-                Welcome back,{' '}
-                <Text className="font-semibold text-neutral-800">
-                  {user?.name}
-                </Text>
-              </Text>
-              <CustomButton
-                title="Go to Home"
-                handlePress={() => router.push('/home')}
-                containerStyles="mb-3"
-              />
-              <CustomButton
-                title="Logout"
-                handlePress={logout}
-                variant="outline"
-                containerStyles="mt-3 border-slate-800"
-                titleStyles=" text-slate-800"
-              />
-            </View>
-          ) : (
-            <View className="w-full mt-6">
-              <CustomButton
-                title="Login"
-                handlePress={() => router.push('/login')}
-              />
-              <CustomButton
-                title="Create Account"
-                handlePress={() => router.push('/signup')}
-                variant="outline"
-                containerStyles="mt-5"
-              />
-            </View>
-          )}
+        </TouchableOpacity>
+      </View>
+      {error ? (
+        <View className="h-full flex justify-center items-center bg-gray-50 rounded-lg">
+          <Text className="text-lg text-gray-800 pt-3">
+            An error occurred while fetching posts! Check your internet
+            connection!
+          </Text>
         </View>
-      </ScrollView>
+      ) : (
+        <FlatList
+          data={posts}
+          ListEmptyComponent={
+            isLoading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <Text className="text-lg text-gray-800 pt-3">
+                An error occurred while fetching posts! Check your internet
+                connection!
+              </Text>
+            )
+          }
+          keyExtractor={(post, index) => `${post.id}-${index}`}
+          renderItem={({ item: post }) => (
+            <TouchableOpacity
+              className="p-3 rounded-lg mb-3 border border-gray-200 shadow-md"
+              onPress={() => router.push(`/post/${post.id}`)}
+            >
+              <Text className="text-xl font-semibold text-gray-800">
+                {post.title}
+              </Text>
+              <Text className="text-base text-gray-600 mb-3">{post.body}</Text>
+            </TouchableOpacity>
+          )}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            !isReachingEnd ? (
+              <ActivityIndicator size="small" color="#0000ff" />
+            ) : null
+          }
+        />
+      )}
     </SafeAreaView>
   );
-};
-
-export default Onboarding;
+}
