@@ -13,9 +13,10 @@ export default function HomeScreen() {
   const { posts, isLoading, error, setSize, isReachingEnd } = usePosts();
   const router = useRouter();
 
+  // load more when scrolled to the bottom
   const loadMore = () => {
     if (!isReachingEnd) {
-      setSize((size) => size + 1);
+      setSize((size) => size + 1); // increment size
     }
   };
   return (
@@ -57,7 +58,11 @@ export default function HomeScreen() {
           renderItem={({ item: post }) => (
             <TouchableOpacity
               className="p-3 rounded-lg mb-3 border border-gray-200 shadow-md"
-              onPress={() => router.push(`/post/${post.id}`)}
+              onPress={() =>
+                parseInt(post.id) === 101
+                  ? router.push(`/post/${post.title}`)
+                  : router.push(`/post/${post.id}`)
+              }
             >
               <Text className="text-xl font-semibold text-gray-800">
                 {post.title}
@@ -66,7 +71,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
           onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={0.5} // when scrolled halfway, load more content
           ListFooterComponent={
             !isReachingEnd ? (
               <ActivityIndicator size="small" color="#0000ff" />

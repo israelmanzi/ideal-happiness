@@ -26,13 +26,23 @@ const PostView = () => {
     if (pathname) {
       const id = pathname.split('/')[2];
 
-      const post = posts?.find((p) => parseInt(p.id) === parseInt(id));
+      const idNumber = parseInt(id);
 
-      if (post) {
-        setPost(post);
-        fetchComments(post.id).then((comments: Comment[]) => {
-          setComments(comments);
-        });
+      if (!isNaN(idNumber) && idNumber === 101) {
+        // If id is not 101, then search for comments
+        const post = posts?.find((p) => parseInt(p.id) === idNumber);
+        if (post) {
+          setPost(post);
+          fetchComments(post.id).then((comments: Comment[]) => {
+            setComments(comments);
+          });
+        }
+      } else {
+        const post = posts?.find((p) => p.title === id); // If id is 101, use title as id
+        if (post) {
+          setPost(post);
+          setComments([]); // Set comments to null if id is 101 because we didn't create our own comments
+        }
       }
     }
   }, [pathname]);

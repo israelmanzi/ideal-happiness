@@ -43,6 +43,7 @@ export default function usePosts() {
     mutate();
   }, [router]);
 
+  // create post
   const createPost = async (post: Omit<Post, 'id'>, redirect?: boolean) => {
     setCreatingPost(true);
     try {
@@ -55,6 +56,7 @@ export default function usePosts() {
           type: 'success',
         });
 
+        // store {...posts, newPost} in async storage
         let asyncPosts = await AsyncStorage.getItem('posts');
         let updatedPosts = [data, ...JSON.parse(asyncPosts || '[]')];
         AsyncStorage.setItem('posts', JSON.stringify(updatedPosts));
@@ -91,6 +93,7 @@ export default function usePosts() {
 
     try {
       if (postId) {
+        // if id provided is from jsonplaceholder api delete the post
         let asyncPosts = await AsyncStorage.getItem('posts');
         if (asyncPosts) {
           let updatedPosts = JSON.parse(asyncPosts).filter(
@@ -113,6 +116,7 @@ export default function usePosts() {
           }
         }
       } else if (title) {
+        // if its the locally created post, use title to remove from async storage
         let asyncPosts = await AsyncStorage.getItem('posts');
         if (asyncPosts) {
           let updatedPosts = JSON.parse(asyncPosts).filter(
@@ -140,6 +144,7 @@ export default function usePosts() {
     }
   };
 
+  // fetch comments
   const fetchComments = async (postId: string) => {
     setCommentsLoading(true);
     try {
